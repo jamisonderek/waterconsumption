@@ -239,15 +239,20 @@ async def main():
     async def send_telemetry():
         print("Sending telemetry for smart valve")
         sent_valve_data = False
+        minute = datetime.now().minute
 
         while True:
-            await asyncio.sleep(15)
             message = iot_device.get_telemetry()
             if sent_valve_data:
                 message.pop("Valve")  # Remove the Valve data, since we already sent that information.
             else:
                 sent_valve_data = True
             await send_telemetry_from_smart_valve(device_client, message)
+
+            # Delay, so we only send telemetry data once per minute.
+            while datetime.now().minute == minute:
+                await asyncio.sleep(2) # wait 2 seconds
+            minute = datetime.now().minute            
 
     send_telemetry_task = asyncio.create_task(send_telemetry())
 
