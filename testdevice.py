@@ -1,22 +1,14 @@
+import asyncio
+
 from iotdevice import IotDevice
 from simulateddevice import SimulatedDevice
 
-import asyncio
-
 async def main():
-    device = IotDevice()
-    #await testDevice(device)
-
     device = SimulatedDevice()
     await testDevice(device)
 
-async def testDevice(device):
-    print ("\n\nTesting {0} device.".format(type(device)))
-    print ("Waiting 10 seconds to allow device to initialize.")
-    await asyncio.sleep(10)
-
+def printTelemetry(device: IotDevice):
     print(device.get_telemetry())
-
     print ("Temperature is {0:.2f}F".format(device.temperature))
     print ("Humidity is {0:.2f} out of 100".format(device.humidity))
     print ("Light is {0:.2f} out of 10".format(device.light))
@@ -24,30 +16,25 @@ async def testDevice(device):
     print ("Flow is {0:.2f} Liters/minute".format(device.flow))
     print ("Valve is {0}".format(device.valve))
 
-    print ("Turning on valve...")
+async def testDevice(device: IotDevice):
+    print ("\n\nTesting {0} device.".format(type(device)))
+    printTelemetry(device)
+
+    print ("\nTurning on valve, then waiting 5 seconds...")
     device.turn_valve_on()
-
-    print ("Waiting 5 seconds for water to allow water to flow.")
     await asyncio.sleep(5)
 
-    print ("Valve is {0}".format(device.valve))
-    print ("Flow is {0} Liters/minute".format(device.flow))
+    printTelemetry(device)
+    if device.get_flow() == 0:
+        print ("\033[93mWARNING: *** NO FLOW DETECTED ***\033[0m")
 
-    print ("Turning off valve...")
+    print ("\nTurning off valve, then waiting 5 seconds...")
     device.turn_valve_off()
-
-    print ("Waiting 5 seconds for water to allow water to stop.")
     await asyncio.sleep(5)
 
-    print ("Valve is {0}".format(device.valve))
-    print ("Flow is {0} Liters/minute".format(device.flow))
-
-    print ("Temperature is {0:.2f}F".format(device.temperature))
-    print ("Humidity is {0:.2f} out of 100".format(device.humidity))
-    print ("Light is {0:.2f} out of 10".format(device.light))
-    print ("Moisture is {0:.2f} out of 10".format(device.moisture))
-    print ("Flow is {0:.2f} Liters/minute".format(device.flow))
-    print ("Valve is {0}".format(device.valve))
+    printTelemetry(device)
+    if device.get_flow() != 0:
+        print ("\033[93mWARNING: *** FLOW DETECTED ***\033[0m")
 
 if __name__ == "__main__":
     asyncio.run(main())
