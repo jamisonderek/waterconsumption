@@ -2,7 +2,7 @@
 This repository was made for the https://iotsustainabilityhack.devpost.com hackathon project.  The code runs on IoT devices (or a computer) and sends data to our Azure IoT Central subscription.
 
 ## Installing
-This application has been tested using [Python 3.8.10](https://www.python.org/downloads/) but any newish version should work fine.<p/>
+This application has been tested using [Python 3.8.10](https://www.python.org/downloads/) but any newish version should work fine.<p>
 To install the application dependencies, please run the following command:
 ```
 pip install -r requirements.txt
