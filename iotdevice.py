@@ -97,3 +97,14 @@ class IotDevice:
     light = property(
         get_light,
         doc="The amount of light (where 0=dark to 10=sunny).")
+
+    def get_telemetry(self):
+        telemetry = {
+            'Valve': 'ValveState.open' if self.get_valve() == ValveState.open else 'ValveState.closed',
+            'Flow': self.get_flow(),
+            'Moisture': self.get_moisture(),
+            'Light': self.get_light(),
+            'Temperature': self.get_temperature(),
+            'Humidity': self.get_humidity()
+        }
+        return telemetry
