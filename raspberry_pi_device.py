@@ -49,12 +49,7 @@ class RaspberryPi(IotDevice):
         self.gpio_flow = gpio_flow
 
     def get_humidity_and_temperature(self):
-        """ Function to return humidity and temperature data.
-
-        Returns:
-            A tuple. First element is humidity (float) and
-                second element is temperature (float).
-        """
+        """ Function to retrieve humidity and temperature data and then update model. """
         try:
             humidity, temperature = Adafruit_DHT.read_retry(
                 self.dht_sensor, self.gpio_dht)
@@ -66,15 +61,15 @@ class RaspberryPi(IotDevice):
         except Exception as e:
             print('Encountered error while trying to retrieve humidity and temeperature data: {0}'.format(e))
 
-
     def get_moisture(self):
+        """ Function to retrieve moisture data and then update model """
         try:
             moist_val = self.gpio_moisture.moisture_read()
             self.set_moisture(moist_val)
         except Exception as e:
             print('Encountered error while trying to retrieve moisture data: {0}'.format(e))
 
-    # Liters/min
+    # Pulse -> Liters/min ???
     def get_flow(self):
         pass
 
@@ -84,8 +79,6 @@ class RaspberryPi(IotDevice):
     def turn_relay_on(self):
         """ Function to turn relay/LED on. """
         self.gpio_relay.on()
-        # on = GPIO.HIGH if use_led else GPIO.LOW
-        # GPIO.output(self.gpio_relay, on)
         # update model
         self.turn_valve_on()
 
