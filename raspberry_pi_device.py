@@ -1,4 +1,4 @@
-import Adafruit_DHT
+import adafruit_dht
 import board
 import busio
 
@@ -17,54 +17,62 @@ class RaspberryPi(IotDevice):
         a variety of sensor data (Moisture, Flow,
         Humidity, Temperature).
 
-    Attributes:
+    Args:
         gpio_relay: Integer. Indicates GPIO pin on Raspberry Pi
             for relay to actuate solenoid valve or an LED for testing.
-        gpio_dht_22: Integer. Indicates GPIO pin on Raspberry Pi for dht22
-            sensor (measures humidity and temperature).
-        gpio_moisture: Integer. Indicates GPIO pin on Raspberry Pi for moisture
-            sensor.
         gpio_flow: Integer. Indicates GPIO pin on Raspberry Pi for flow sensor.
         ip_address: Optional. A string. Indicates IP Address of Raspberry Pi.
             By default None. If provided, then use PiGPIOFactory package
             for remote GPIO control.
-        dht_sensor: Optional. Adafruit_DHT object. By default the Adafruit DHT22
-            to measure humidity and temperature. Indicates what DHT sensor type.
+
+    Attributes:
+        dht_sensor: DHT22 sensor to measure humidity and temperature. connected
+            to pin 18 for now.
+        moisture_sensor: connected to pin 3 and pin 2 for now
     """
-    def __init__(self, gpio_relay, gpio_dht22,
-                 gpio_flow, ip_address=None, dht_sensor=Adafruit_DHT.DHT22):
+    def __init__(self, gpio_relay, gpio_flow, ip_address=None):
         IotDevice.__init__(self)
 
         if ip_address is not None:
             self.gpio_relay = LED(gpio_relay, PiGPIOFactory(host=ip_address))
         else:
+            print('in here')
             self.gpio_relay = LED(gpio_relay)
 
-        self.dht_sensor = dht_sensor
-        self.gpio_dht = gpio_dht22
+        # For now we want to leave the DHT_22 sensor (measures temperature and humidity)
+        # connected to pin 18.
+        self.dht_sensor = adafruit_dht.DH22(board.D18)
 
         # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
         # meaning moisture sensor will need to be connected to these pins
-        self.gpio_moisture = Seesaw(board.I2C(board.D3, board.D2), addr=0x36)
+        self.moisture_sensor = Seesaw(board.I2C(board.D3, board.D2), addr=0x36)
         self.gpio_flow = gpio_flow
 
     def get_humidity_and_temperature(self):
         """ Function to retrieve humidity and temperature data and then update model. """
-        try:
-            humidity, temperature = Adafruit_DHT.read_retry(
-                self.dht_sensor, self.gpio_dht)
+        temperature_f, humidity = None, None
 
-            if all((humidity, temperature)):
-                # update model
-                self.set_temperature(temperature)
-                self.set_humidity(humidity)
-        except Exception as e:
-            print('Encountered error while trying to retrieve humidity and temeperature data: {0}'.format(e))
+        while humidity is None and temperature_f is None:
+            try:
+                temperature_c = self.dht_sensor.temperature
+                temperature_f = temperature_c * (9 / 5) + 32
+                humidity = self.dht_sensor.humidity
+            except RuntimeError as err:
+                # DHT's are hard to read, keep going
+                time.sleep(2.0)
+                continue
+            except Exception as err:
+                print('Encountered error while trying to retrieve humidity and temeperature data: {0}'.format(e))
+
+        # update model
+        self.set_temperature(temperature_f)
+        self.set_humidity(humidity)
 
     def get_moisture(self):
         """ Function to retrieve moisture data and then update model """
         try:
-            moist_val = self.gpio_moisture.moisture_read()
+            moist_val = self.moisture_sensor.moisture_read()
+            # upate model
             self.set_moisture(moist_val)
         except Exception as e:
             print('Encountered error while trying to retrieve moisture data: {0}'.format(e))
