@@ -1,26 +1,20 @@
-from iotdevice import IotDevice
+import Adafruit_DHT
+import board
+import busio
 
 from gpiozero import LED
 from gpiozero.pins.pigpio import PiGPIOFactory
 
-import gpiozero
+from iotdevice import IotDevice
 
-import RPi.GPIO as GPIO
-import Adafruit_DHT
-import time
-
-from time import sleep
-
-# TODO Brian: Add attributes for sensors. moisture, flow sensor,
+# TODO Brian: Add attributes for sensors. flow sensor,
 # light sensor. Do we want to integrate some sort of weather tracker that
 # scrapes for weather data?
-# actually the gpiozero library is essentially a wrapper around rpi.GPIO. need
-# to stick to one
 class RaspberryPi(IotDevice):
     """ Class to interface with Raspberry Pi for
         an Automated Irrigation System. This Raspberry Pi
         setup actuates a solenoid valve that is collecting
-        a variety of sensor data Moisture, Flow,
+        a variety of sensor data (Moisture, Flow,
         Humidity, Temperature).
 
     Attributes:
@@ -32,35 +26,27 @@ class RaspberryPi(IotDevice):
             sensor.
         gpio_flow: Integer. Indicates GPIO pin on Raspberry Pi for flow sensor.
         ip_address: Optional. A string. Indicates IP Address of Raspberry Pi.
-            By default None. If provided, then use gpiozero third party library
-            to control GPIO remotely.
+            By default None. If provided, then use PiGPIOFactory library
+            for remote GPIO control.
         dht_sensor: Optional. Adafruit_DHT object. By default the Adafruit DHT22
             to measure humidity and temperature. Indicates what DHT sensor type.
     """
-    def __init__(self, gpio_relay, gpio_dht22, gpio_moisture,
+    def __init__(self, gpio_relay, gpio_dht22,
                  gpio_flow, ip_address=None, dht_sensor=Adafruit_DHT.DHT22):
         IotDevice.__init__(self)
 
-        self.gpio_relay = gpio_relay
-        self.gpio_dht = gpio_dht22
-        self.gpio_moisture = gpio_moisture
-        self.gpio_flow = gpio_flow
+        if ip_address is not None:
+            self.gpio_relay = LED(gpio_relay, PiGPIOFactory(host=ip_address))
+        else:
+            self.gpio_relay = LED(gpio_relay)
 
         self.dht_sensor = dht_sensor
-        self.ip_address = ip_address
+        self.gpio_dht = gpio_dht22
 
-        self._setup_pi_gpio()
-
-    #TODO: Integrate gpiozero third party library to control GPIO remotely
-    def _setup_pi_gpio(self):
-        """ Helper function to setup the output GPIO pins. """
-        if self.ip_address:
-            pass
-        else:
-            GPIO.setmode(GPIO.BCM)
-            GPIO.setwarnings(False)
-
-            GPIO.setup(self.gpio_relay, GPIO.OUT)
+        # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
+        # meaning moisture sensor will need to be connected to these pins
+        self.gpio_moisture = Seesaw(board.I2C(board.D3, board.D2), addr=0x36)
+        self.gpio_flow = gpio_flow
 
     def get_humidity_and_temperature(self):
         """ Function to return humidity and temperature data.
@@ -78,52 +64,33 @@ class RaspberryPi(IotDevice):
                 self.set_temperature(temperature)
                 self.set_humidity(humidity)
         except Exception as e:
-            print('Encountered error while trying to retrieve data: {0}'.format(e))
+            print('Encountered error while trying to retrieve humidity and temeperature data: {0}'.format(e))
 
-    # TODO: Implement moisture & flow
+
     def get_moisture(self):
-        pass
+        try:
+            moist_val = self.gpio_moisture.moisture_read()
+            self.set_moisture(moist_val)
+        except Exception as e:
+            print('Encountered error while trying to retrieve moisture data: {0}'.format(e))
 
     # Liters/min
     def get_flow(self):
         pass
 
-    def turn_relay_on(self, use_led=False):
-        """ Function to turn relay/LED on.
-
-        Args:
-            use_led: Boolean. By default False. Set to True if using a LED
-        """
-        on = GPIO.HIGH if use_led else GPIO.LOW
-        GPIO.output(self.gpio_relay, on)
+    # turn_relay_on and turn_relay_off might be redundant
+    # as it is just wrapping around gpiozero
+    # and then updating state
+    def turn_relay_on(self):
+        """ Function to turn relay/LED on. """
+        self.gpio_relay.on()
+        # on = GPIO.HIGH if use_led else GPIO.LOW
+        # GPIO.output(self.gpio_relay, on)
         # update model
         self.turn_valve_on()
 
-    def turn_relay_off(self, use_led=False):
-        """ Function to turn relay/LED on.
-
-        Args:
-            use_led: Boolean. By default False. Set to True if using a LED
-        """
-        off = GPIO.LOW if use_led else GPIO.HIGH
-        GPIO.output(self.gpio_relay, off)
+    def turn_relay_off(self):
+        """ Function to turn relay/LED off. """
+        self.gpio_relay.off()
         # update model
         self.turn_valve_off()
-
-
-
-
-
-# factory = PiGPIOFactory(host='192.168.1.6')
-#
-# red = LED(17,pin_factory=factory)
-#
-# while True:
-#
-# red.on()
-#
-# sleep(1)
-#
-# red.off()
-#
-# sleep(1)
