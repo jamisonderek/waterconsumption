@@ -26,7 +26,7 @@ class RaspberryPi(IotDevice):
             sensor.
         gpio_flow: Integer. Indicates GPIO pin on Raspberry Pi for flow sensor.
         ip_address: Optional. A string. Indicates IP Address of Raspberry Pi.
-            By default None. If provided, then use PiGPIOFactory library
+            By default None. If provided, then use PiGPIOFactory package
             for remote GPIO control.
         dht_sensor: Optional. Adafruit_DHT object. By default the Adafruit DHT22
             to measure humidity and temperature. Indicates what DHT sensor type.
@@ -69,7 +69,7 @@ class RaspberryPi(IotDevice):
         except Exception as e:
             print('Encountered error while trying to retrieve moisture data: {0}'.format(e))
 
-    # Pulse -> Liters/min ???
+    # Pulse -> Liters/min ??
     def get_flow(self):
         pass
 
