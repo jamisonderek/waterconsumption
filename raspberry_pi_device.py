@@ -2,6 +2,8 @@ import adafruit_dht
 import board
 import busio
 
+from adafruit_seesaw.seesaw import Seesaw
+
 from gpiozero import LED
 from gpiozero.pins.pigpio import PiGPIOFactory
 
@@ -36,7 +38,6 @@ class RaspberryPi(IotDevice):
         if ip_address is not None:
             self.gpio_relay = LED(gpio_relay, PiGPIOFactory(host=ip_address))
         else:
-            print('in here')
             self.gpio_relay = LED(gpio_relay)
 
         # For now we want to leave the DHT_22 sensor (measures temperature and humidity)
