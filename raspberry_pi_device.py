@@ -1,6 +1,7 @@
 import adafruit_dht
 import board
-import busio
+
+import time
 
 from adafruit_seesaw.seesaw import Seesaw
 
