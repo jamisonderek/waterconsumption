@@ -68,8 +68,8 @@ class RaspberryPi(IotDevice):
                 return
 
         # update model
-        self.set_temperature(temperature_f)
-        self.set_humidity(humidity)
+        self.set_humidity_and_temperature(humidity, temperature_f)
+        return super().get_humidity_and_temperature()
 
     def get_moisture(self):
         """ Function to retrieve moisture data and then update model """
@@ -79,6 +79,7 @@ class RaspberryPi(IotDevice):
             self.set_moisture(moist_val)
         except Exception as e:
             print('Encountered error while trying to retrieve moisture data: {0}'.format(e))
+        return super().get_moisture()
 
     # Pulse -> Liters/min ??
     def get_flow(self):

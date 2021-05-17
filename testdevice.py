@@ -9,8 +9,9 @@ async def main():
 
 def printTelemetry(device: IotDevice):
     print(device.get_telemetry())
-    print ("Temperature is {0:.2f}F".format(device.temperature))
-    print ("Humidity is {0:.2f} out of 100".format(device.humidity))
+    humidity, tempF = device.humidity_and_temperature
+    print ("Temperature is {0:.2f}F".format(tempF))
+    print ("Humidity is {0:.2f} out of 100".format(humidity))
     print ("Light is {0:.2f} out of 10".format(device.light))
     print ("Moisture is {0:.2f} out of 10".format(device.moisture))
     print ("Flow is {0:.2f} Liters/minute".format(device.flow))
