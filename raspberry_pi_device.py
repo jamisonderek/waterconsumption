@@ -63,7 +63,7 @@ class RaspberryPi(IotDevice):
                 # DHT's are hard to read, keep going
                 time.sleep(2.0)
                 continue
-            except Exception as err:
+            except Exception as e:
                 print('Encountered error while trying to retrieve humidity and temeperature data: {0}'.format(e))
                 return
 
@@ -98,3 +98,5 @@ class RaspberryPi(IotDevice):
         self.gpio_relay.off()
         # update model
         self.turn_valve_off()
+
+        
