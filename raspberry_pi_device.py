@@ -43,7 +43,7 @@ class RaspberryPi(IotDevice):
 
         # For now we want to leave the DHT_22 sensor (measures temperature and humidity)
         # connected to pin 18.
-        self.dht_sensor = adafruit_dht.DH22(board.D18)
+        self.dht_sensor = adafruit_dht.DHT22(board.D18)
 
         # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
         # meaning moisture sensor will need to be connected to these pins
