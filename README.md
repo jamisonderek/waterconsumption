@@ -5,7 +5,7 @@ This repository was made for the https://iotsustainabilityhack.devpost.com hacka
 This application has been tested using [Python 3.8.10](https://www.python.org/downloads/) but any newish version should work fine.<p>
 To install the application dependencies, please run the following command:
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Setup for debugging in Visual Studio Code
