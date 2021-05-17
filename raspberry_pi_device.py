@@ -9,6 +9,7 @@ from gpiozero import LED
 from gpiozero.pins.pigpio import PiGPIOFactory
 
 from iotdevice import IotDevice
+from gpio_frequency import FrequencySignal
 
 # TODO Brian: Add attributes for sensors. flow sensor,
 # light sensor. Do we want to integrate some sort of weather tracker that
@@ -48,7 +49,7 @@ class RaspberryPi(IotDevice):
         # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
         # meaning moisture sensor will need to be connected to these pins
         self.moisture_sensor = Seesaw(board.I2C(board.D3, board.D2), addr=0x36)
-        self.gpio_flow = gpio_flow
+        self.gpio_flow = FrequencySignal(gpio_flow)
 
     def get_humidity_and_temperature(self):
         """ Function to retrieve humidity and temperature data and then update model. """
@@ -81,9 +82,13 @@ class RaspberryPi(IotDevice):
             print('Encountered error while trying to retrieve moisture data: {0}'.format(e))
         return super().get_moisture()
 
-    # Pulse -> Liters/min ??
     def get_flow(self):
-        pass
+        """ Funtion to retrieve flow data and then update model """
+
+        # For our device you get 3.1Hz for each Liter/minute of water
+        rate = 3.1  # Adjust this based on testing your device.
+        self.set_flow(self.gpio_flow.measure_frequency() / rate)
+        return super().get_flow()
 
     # turn_relay_on and turn_relay_off might be redundant
     # as it is just wrapping around gpiozero
