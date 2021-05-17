@@ -65,7 +65,7 @@ class RaspberryPi(IotDevice):
                 continue
             except Exception as e:
                 print('Encountered error while trying to retrieve humidity and temeperature data: {0}'.format(e))
-                return
+                return (None, None)
 
         # update model
         self.set_humidity_and_temperature(humidity, temperature_f)
