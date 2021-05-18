@@ -1,4 +1,5 @@
 import adafruit_dht
+import busio
 import board
 
 import time
