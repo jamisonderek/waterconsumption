@@ -9,6 +9,7 @@ from azure.iot.device import Message, MethodResponse
 from datetime import timedelta, datetime
 from iotdevice import IotDevice, ValveState
 from simulateddevice import SimulatedDevice
+from threading import Timer
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -22,17 +23,28 @@ model_id = "dtmi:waterconsumption:SmartWaterValve;1"
 # depending on what commands the DTMI defines
 
 async def turn_valve_on_handler(iot_device: IotDevice, values):
-    # TODO: Cancel any previous timer.
+    iot_device.cancel_timer()
     if values and type(values) == int:
-        print("Turning device on for {count} secs".format(count=values))
-        # TODO: Set a timer to turn off device.
+        duration = values
+        print("Turning device on for {0} secs".format(duration))
+        _auto_shutoff_timer(iot_device, duration)
     else:
         print("Turning device on.")
     iot_device.turn_valve_on()
 
 async def turn_valve_off_handler(iot_device: IotDevice, values):
-    # TODO: Cancel any timers from turn_valve_on_handler
+    iot_device.cancel_timer()
     print("Turning device off.")
+    iot_device.turn_valve_off()
+
+def _auto_shutoff_timer(iot_device: IotDevice, duration):
+    timer = Timer(duration, _auto_shutoff_handlers, [iot_device])
+    iot_device.set_timer(timer)
+    timer.start()
+
+def _auto_shutoff_handlers(iot_device: IotDevice):
+    iot_device.cancel_timer()
+    print("Auto shutoff, turning device off..")
     iot_device.turn_valve_off()
 
 # END COMMAND HANDLERS
