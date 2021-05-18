@@ -7,12 +7,21 @@ class ValveState(Enum):
 
 class IotDevice:
     def __init__(self):
+        self.__timer = None
         self.turn_valve_off()
         self.__temperature = 0.0
         self.__humidity = 0.0
         self.__moisture = 0.0
         self.__light = 0.0
         self.__flow = 0.0
+
+    def cancel_timer(self):
+        if self.__timer != None:
+            self.__timer.cancel()
+            self.__timer = None
+
+    def set_timer(self, timer):
+        self.__timer = timer
 
     def get_valve(self):
         return self.__valve
