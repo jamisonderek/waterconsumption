@@ -91,17 +91,14 @@ class RaspberryPi(IotDevice):
         self.set_flow(self.gpio_flow.measure_frequency() / rate)
         return super().get_flow()
 
-    # turn_relay_on and turn_relay_off might be redundant
-    # as it is just wrapping around gpiozero
-    # and then updating state
-    def turn_relay_on(self):
+    def turn_valve_on(self):
         """ Function to turn relay/LED on. """
         self.gpio_relay.on()
         # update model
-        self.turn_valve_on()
+        super().turn_valve_on()
 
-    def turn_relay_off(self):
+    def turn_valve_off(self):
         """ Function to turn relay/LED off. """
         self.gpio_relay.off()
         # update model
-        self.turn_valve_off()
+        super().turn_valve_off()
