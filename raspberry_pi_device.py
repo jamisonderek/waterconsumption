@@ -47,7 +47,7 @@ class RaspberryPi(IotDevice):
 
         # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
         # meaning moisture sensor will need to be connected to these pins
-        self.moisture_sensor = Seesaw(board.I2C(board.D3, board.D2), addr=0x36)
+        self.moisture_sensor = Seesaw(busio.I2C(board.D3, board.D2), addr=0x36)
         self.gpio_flow = gpio_flow
 
     def get_humidity_and_temperature(self):
@@ -98,5 +98,3 @@ class RaspberryPi(IotDevice):
         self.gpio_relay.off()
         # update model
         self.turn_valve_off()
-
-        
