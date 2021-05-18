@@ -1,4 +1,3 @@
-from iotdevice import IotDevice
 import os
 import asyncio
 import logging
@@ -6,9 +5,9 @@ import json
 
 from azure.iot.device.aio import IoTHubDeviceClient
 from azure.iot.device.aio import ProvisioningDeviceClient
-from azure.iot.device import constant, Message, MethodResponse
-from datetime import date, timedelta, datetime
-
+from azure.iot.device import Message, MethodResponse
+from datetime import timedelta, datetime
+from iotdevice import IotDevice, ValveState
 from simulateddevice import SimulatedDevice
 
 logging.basicConfig(level=logging.ERROR)
@@ -55,14 +54,12 @@ async def turn_valve_on_response(iot_device: IotDevice, device_client, values):
     if values and type(values) == int:
         duration = values
         response_dict["endTime"] = (datetime.now() + timedelta(0, duration)).isoformat()
-    await send_telemetry_from_smart_valve(device_client,{"Valve": "ValveState.open"})
     return serialize(response_dict)
 
 async def turn_valve_off_response(iot_device: IotDevice, device_client, values):
     response_dict = {
         "endTime": datetime.now().isoformat()
     }
-    await send_telemetry_from_smart_valve(device_client,{"Valve": "ValveState.closed"})
     return serialize(response_dict)
 
 # END CREATE RESPONSES TO COMMANDS
@@ -238,15 +235,11 @@ async def main():
 
     async def send_telemetry():
         print("Sending telemetry for smart valve")
-        sent_valve_data = False
         minute = datetime.now().minute
 
         while True:
             message = iot_device.get_telemetry()
-            if sent_valve_data:
-                message.pop("Valve")  # Remove the Valve data, since we already sent that information.
-            else:
-                sent_valve_data = True
+            message.pop("Valve")
             await send_telemetry_from_smart_valve(device_client, message)
 
             # Delay, so we only send telemetry data once per minute.
@@ -254,7 +247,24 @@ async def main():
                 await asyncio.sleep(2) # wait 2 seconds
             minute = datetime.now().minute            
 
+    async def send_valve_telemetry():
+        print("Sending valve telemetry for smart valve")
+        last_valve_data = None
+
+        while True:
+            valve = iot_device.get_valve()
+            if valve != last_valve_data:
+                last_valve_data = valve
+                if (valve == ValveState.closed):
+                    message = {"Valve": "ValveState.closed"}
+                else:
+                    message = {"Valve": "ValveState.open"}
+                await send_telemetry_from_smart_valve(device_client, message)
+
+            await asyncio.sleep(5) # Update the flow data every 5 seconds.
+
     send_telemetry_task = asyncio.create_task(send_telemetry())
+    send_valve_telemetry_task = asyncio.create_task(send_valve_telemetry())
 
     # Run the stdin listener in the event loop
     loop = asyncio.get_running_loop()
@@ -269,6 +279,7 @@ async def main():
     listeners.cancel()
 
     send_telemetry_task.cancel()
+    send_valve_telemetry_task.cancel()
 
     # Finally, shut down the client
     await device_client.shutdown()
