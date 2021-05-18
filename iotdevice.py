@@ -46,31 +46,19 @@ class IotDevice:
         get_flow,
         doc="The current rate of water flow in liters per minute.")
 
-    def get_temperature(self):
+    def get_humidity_and_temperature(self):
         """
-        This method should return the current temperature (F).
+        This method should return the relative humidity (0 to 100) and current temperature (F).
         """
-        return self.__temperature
+        return (self.__humidity, self.__temperature)
 
-    def set_temperature(self, value):
-        self.__temperature = value
+    def set_humidity_and_temperature(self, humidity, tempF):
+        self.__temperature = tempF
+        self.__humidity = humidity
 
-    temperature = property(
-        get_temperature,
-        doc="The temperature in Fahrenheit.")
-
-    def get_humidity(self):
-        """
-        This method should return the relative humidity (0 to 100).
-        """
-        return self.__humidity
-
-    def set_humidity(self, value):
-        self.__humidity = value
-
-    humidity = property(
-        get_humidity,
-        doc="The relative humidity (0 to 100).")
+    humidity_and_temperature = property(
+        get_humidity_and_temperature,
+        doc="The relative humidity (0 to 100) and temperature in Fahrenheit.")
 
     def get_moisture(self):
         """
@@ -99,12 +87,13 @@ class IotDevice:
         doc="The amount of light (where 0=dark to 10=sunny).")
 
     def get_telemetry(self):
+        humidity, tempF = self.get_humidity_and_temperature()
         telemetry = {
             'Valve': 'ValveState.open' if self.get_valve() == ValveState.open else 'ValveState.closed',
             'Flow': self.get_flow(),
             'Moisture': self.get_moisture(),
             'Light': self.get_light(),
-            'Temperature': self.get_temperature(),
-            'Humidity': self.get_humidity()
+            'Temperature': tempF,
+            'Humidity': humidity
         }
         return telemetry

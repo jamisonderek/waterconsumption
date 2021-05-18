@@ -1,12 +1,12 @@
 import asyncio
 
 from iotdevice import IotDevice
-from simulateddevice import SimulatedDevice
+from raspberry_pi_device import RaspberryPi
 
 async def main():
-    device = SimulatedDevice()
+    device = RaspberryPi(gpio_relay=9, gpio_flow=10)
     await testDevice(device)
-
+        
 def printTelemetry(device: IotDevice):
     print(device.get_telemetry())
     humidity, tempF = device.humidity_and_temperature
