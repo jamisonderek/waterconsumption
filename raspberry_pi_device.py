@@ -29,13 +29,15 @@ class RaspberryPi(IotDevice):
         ip_address: Optional. A string. Indicates IP Address of Raspberry Pi.
             By default None. If provided, then use PiGPIOFactory package
             for remote GPIO control.
+        use_dht_11: Optional. A boolean. When set to True a DHT11 will be used
+            instead of the DHT22.  By default False.
 
     Attributes:
         dht_sensor: DHT22 sensor to measure humidity and temperature. connected
             to pin 18 for now.
         moisture_sensor: connected to pin 3 and pin 2 for now
     """
-    def __init__(self, gpio_relay, gpio_flow, ip_address=None):
+    def __init__(self, gpio_relay, gpio_flow, ip_address=None, use_dht_11=False):
         IotDevice.__init__(self)
 
         if ip_address is not None:
@@ -43,9 +45,9 @@ class RaspberryPi(IotDevice):
         else:
             self.gpio_relay = LED(gpio_relay)
 
-        # For now we want to leave the DHT_22 sensor (measures temperature and humidity)
+        # For now we want to leave the DHT sensor (measures temperature and humidity)
         # connected to pin 18.
-        self.dht_sensor = adafruit_dht.DHT22(board.D18)
+        self.dht_sensor = adafruit_dht.DHT11(board.D18) if use_dht_11 else adafruit_dht.DHT22(board.D18)
 
         # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
         # meaning moisture sensor will need to be connected to these pins
