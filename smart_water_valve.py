@@ -7,8 +7,8 @@ from azure.iot.device.aio import IoTHubDeviceClient
 from azure.iot.device.aio import ProvisioningDeviceClient
 from azure.iot.device import Message, MethodResponse
 from datetime import timedelta, datetime
+from hybrid_device import HybridDevice
 from iotdevice import IotDevice, ValveState
-from simulateddevice import SimulatedDevice
 from threading import Timer
 
 logging.basicConfig(level=logging.ERROR)
@@ -212,8 +212,8 @@ async def main():
     # Connect the client.
     await device_client.connect()
 
-    # TODO: Replace with real device.
-    iot_device = SimulatedDevice()
+    iot_device = HybridDevice()
+    iot_device.turn_valve_off()
 
     ################################################
     # Set and read desired property (target temperature)
