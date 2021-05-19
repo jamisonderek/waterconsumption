@@ -11,8 +11,12 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
-                "IOTHUB_DEVICE_SECURITY_TYPE": "DPS",
-                "IOTHUB_DEVICE_DPS_ENDPOINT": "global.azure-devices-provisioning.net",
+                "IOTHUB_DEVICE_GPIO_RELAY": "SIM",
+                "IOTHUB_DEVICE_GPIO_FLOW": "SIM",
+                "IOTHUB_DEVICE_GPIO_FLOW_LPM": "20.0",
+                "IOTHUB_DEVICE_USE_DHT_11": "SIM",
+                "IOTHUB_DEVICE_MOISTURE": "SIM",
+                "IOTHUB_DEVICE_LIGHT": "SIM",
                 "IOTHUB_DEVICE_DPS_DEVICE_ID": "sample-device-01",
                 "IOTHUB_DEVICE_DPS_ID_SCOPE": "<Your Scope Here...>",
                 "IOTHUB_DEVICE_DPS_DEVICE_KEY": "<Your Key Here...>"
