@@ -246,7 +246,6 @@ async def main():
     # Send telemetry 
 
     async def send_telemetry():
-        print("Sending telemetry for smart valve")
         minute = datetime.now().minute
 
         while True:
@@ -260,7 +259,6 @@ async def main():
             minute = datetime.now().minute            
 
     async def send_valve_telemetry():
-        print("Sending valve telemetry for smart valve")
         last_valve_data = None
 
         while True:
