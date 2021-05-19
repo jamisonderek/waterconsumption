@@ -1,19 +1,24 @@
-import adafruit_dht
 import busio
-import board
 
-import time
+try:
+    import adafruit_dht
+except ImportError:
+    print ("\033[91mError importing DHT code -- Are you running on an IoT device?\033[0m")
+
+try:
+    import board
+except NotImplementedError:
+    print ("\033[91mError importing board -- Are you running on an IoT device?\033[0m")
 
 from adafruit_seesaw.seesaw import Seesaw
-
 from gpiozero import LED
 from gpiozero.pins.pigpio import PiGPIOFactory
-
-from iotdevice import IotDevice
 from gpio_frequency import FrequencySignal
+from iotdevice import IotDevice
+from time import sleep
 
-# TODO Brian: Add attributes for sensors. flow sensor,
-# light sensor. Do we want to integrate some sort of weather tracker that
+# TODO Brian: Add attributes for light sensor. 
+# TODO: Do we want to integrate some sort of weather tracker that
 # scrapes for weather data?
 class RaspberryPi(IotDevice):
     """ Class to interface with Raspberry Pi for
@@ -31,28 +36,43 @@ class RaspberryPi(IotDevice):
             for remote GPIO control.
         use_dht_11: Optional. A boolean. When set to True a DHT11 will be used
             instead of the DHT22.  By default False.
+        moisture: Optional. A String. "I2C" or "SIM" (for simulated device).
+            By default "I2C".
 
     Attributes:
         dht_sensor: DHT22 sensor to measure humidity and temperature. connected
             to pin 18 for now.
         moisture_sensor: connected to pin 3 and pin 2 for now
     """
-    def __init__(self, gpio_relay, gpio_flow, ip_address=None, use_dht_11=False):
+    def __init__(self, gpio_relay, gpio_flow, ip_address=None, use_dht_11=False, moisture="I2C"):
         IotDevice.__init__(self)
 
-        if ip_address is not None:
-            self.gpio_relay = LED(gpio_relay, PiGPIOFactory(host=ip_address))
+        if gpio_relay == "SIM":
+            self.gpio_relay = None
         else:
-            self.gpio_relay = LED(gpio_relay)
+            if ip_address is not None:
+                self.gpio_relay = LED(gpio_relay, PiGPIOFactory(host=ip_address))
+            else:
+                self.gpio_relay = LED(gpio_relay)
 
         # For now we want to leave the DHT sensor (measures temperature and humidity)
         # connected to pin 18.
-        self.dht_sensor = adafruit_dht.DHT11(board.D18) if use_dht_11 else adafruit_dht.DHT22(board.D18)
+        if use_dht_11 == "SIM":
+            self.dht_sensor = None
+        else:
+            self.dht_sensor = adafruit_dht.DHT11(board.D18) if use_dht_11 else adafruit_dht.DHT22(board.D18)
 
         # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
         # meaning moisture sensor will need to be connected to these pins
-        self.moisture_sensor = Seesaw(busio.I2C(board.D3, board.D2), addr=0x36)
-        self.gpio_flow = FrequencySignal(gpio_flow)
+        if moisture == "SIM":
+            self.moisture_sensor = None
+        else:
+            self.moisture_sensor = Seesaw(busio.I2C(board.D3, board.D2), addr=0x36)
+
+        if gpio_flow == "SIM":
+            self.gpio_flow = None
+        else:
+            self.gpio_flow = FrequencySignal(gpio_flow)
 
     def get_humidity_and_temperature(self):
         """ Function to retrieve humidity and temperature data and then update model. """
@@ -65,7 +85,7 @@ class RaspberryPi(IotDevice):
                 humidity = self.dht_sensor.humidity
             except RuntimeError as err:
                 # DHT's are hard to read, keep going
-                time.sleep(2.0)
+                sleep(2.0)
                 continue
             except Exception as e:
                 print('Encountered error while trying to retrieve humidity and temeperature data: {0}'.format(e))
@@ -88,19 +108,30 @@ class RaspberryPi(IotDevice):
     def get_flow(self):
         """ Funtion to retrieve flow data and then update model """
 
-        # For our device you get 3.1Hz for each Liter/minute of water
-        rate = 3.1  # Adjust this based on testing your device.
-        self.set_flow(self.gpio_flow.measure_frequency() / rate)
+        try:
+            # For our device you get 3.1Hz for each Liter/minute of water
+            rate = 3.1  # Adjust this based on testing your device.
+            self.set_flow(self.gpio_flow.measure_frequency() / rate)
+        except Exception as e:
+            print('Encountered error while trying to retrieve flow data: {0}'.format(e))
         return super().get_flow()
 
     def turn_valve_on(self):
         """ Function to turn relay/LED on. """
-        self.gpio_relay.on()
+
+        try:
+            self.gpio_relay.on()
+        except Exception as e:
+            print('Encountered error while trying to turn relay on: {0}'.format(e))
         # update model
         super().turn_valve_on()
 
     def turn_valve_off(self):
         """ Function to turn relay/LED off. """
-        self.gpio_relay.off()
+
+        try:
+            self.gpio_relay.off()
+        except Exception as e:
+            print('Encountered error while trying to turn relay off: {0}'.format(e))
         # update model
         super().turn_valve_off()
