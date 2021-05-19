@@ -44,7 +44,7 @@ class RaspberryPi(IotDevice):
             to pin 18 for now.
         moisture_sensor: connected to pin 3 and pin 2 for now
     """
-    def __init__(self, gpio_relay, gpio_flow, ip_address=None, use_dht_11=False, moisture="I2C"):
+    def __init__(self, gpio_relay, gpio_flow, ip_address=None, humid_temp="DHT22", moisture="I2C"):
         IotDevice.__init__(self)
 
         if gpio_relay == "SIM":
@@ -57,10 +57,15 @@ class RaspberryPi(IotDevice):
 
         # For now we want to leave the DHT sensor (measures temperature and humidity)
         # connected to pin 18.
-        if use_dht_11 == "SIM":
-            self.dht_sensor = None
+        if humid_temp == "BME280":
+            # TODO: Implement BME280 support
+            self.ht_sensor = None
+        elif humid_temp == "DHT11":
+            self.ht_sensor = adafruit_dht.DHT11(board.D18)
+        elif humid_temp == "DHT22":
+            self.ht_sensor = adafruit_dht.DHT22(board.D18)
         else:
-            self.dht_sensor = adafruit_dht.DHT11(board.D18) if use_dht_11 else adafruit_dht.DHT22(board.D18)
+            self.ht_sensor = None
 
         # For now we want to leave SCL to pin 3 and SDA to pin 2 for i2c interface.
         # meaning moisture sensor will need to be connected to these pins
@@ -80,9 +85,9 @@ class RaspberryPi(IotDevice):
 
         while humidity is None and temperature_f is None:
             try:
-                temperature_c = self.dht_sensor.temperature
+                temperature_c = self.ht_sensor.temperature
                 temperature_f = temperature_c * (9 / 5) + 32
-                humidity = self.dht_sensor.humidity
+                humidity = self.ht_sensor.humidity
             except RuntimeError as err:
                 # DHT's are hard to read, keep going
                 sleep(2.0)
