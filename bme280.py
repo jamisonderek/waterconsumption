@@ -2,7 +2,7 @@ import adafruit_bme280
 
 class Bme280:
     def __init__(self, i2c):
-        self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c, 0x76)
     
     def get_temperature(self):
         return self.__bme280.temperature
