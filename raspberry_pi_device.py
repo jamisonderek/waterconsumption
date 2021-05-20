@@ -106,6 +106,12 @@ class RaspberryPi(IotDevice):
         """ Function to retrieve moisture data and then update model """
         try:
             moist_val = self.moisture_sensor.moisture_read()
+            moist_val -= 300
+            moist_val *= 0.014
+            if moist_val < 0:
+                moist_val = 0
+            if moist_val > 10:
+                moist_val = 10
             # upate model
             self.set_moisture(moist_val)
         except Exception as e:
