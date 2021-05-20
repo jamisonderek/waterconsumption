@@ -1,4 +1,5 @@
 Adafruit-Blinka ~= 6.9.1
+adafruit-circuitpython-bme280 ~= 2.6.3
 adafruit-circuitpython-dht ~= 3.6.1
 adafruit-circuitpython-seesaw ~= 1.8.1
 azure-iot-device ~= 2.5.1

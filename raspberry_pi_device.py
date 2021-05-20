@@ -1,3 +1,4 @@
+from bme280 import Bme280
 import busio
 
 try:
@@ -58,8 +59,9 @@ class RaspberryPi(IotDevice):
         # For now we want to leave the DHT sensor (measures temperature and humidity)
         # connected to pin 18.
         if humid_temp == "BME280":
-            # TODO: Implement BME280 support
-            self.ht_sensor = None
+            i2c = board.I2C()
+            self.ht_sensor = Bme280(i2c)
+            self.ht_sensor.set_sea_level_pressure(1022.2)
         elif humid_temp == "DHT11":
             self.ht_sensor = adafruit_dht.DHT11(board.D18)
         elif humid_temp == "DHT22":
