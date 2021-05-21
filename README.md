@@ -44,8 +44,8 @@ In Visual Studio Code, you can set an envionment variable using the .vscode/laun
 
 Variable | Supported Values | Recommended value | Comment
 ------|------|-------|-----
-IOTHUB_DEVICE_GPIO_RELAY | "SIM" or pin | 16 | The GPIO pin connected to the relay to turn the water on/off.
-IOTHUB_DEVICE_GPIO_FLOW | "SIM" or pin | 13 | The GPIO pin connected to the flow meter.
+IOTHUB_DEVICE_GPIO_RELAY | "SIM" or pin | 23 | The GPIO pin connected to the relay to turn the water on/off.
+IOTHUB_DEVICE_GPIO_FLOW | "SIM" or pin | 27 | The GPIO pin connected to the flow meter.
 IOTHUB_DEVICE_GPIO_FLOW_LPM | double | 25.0 | The flow rate (liters/minute) when the relay is on (used when GPIO_FLOW is set to SIM).
 IOTHUB_DEVICE_HUMIDITY_TEMP | "SIM", "DHT11", "DHT22", "BME280" | "DHT22" | If "DHT11" or "DHT22" connect to GPIO18 (pin 12).  If "BME280" connect to SDA/SCL of I2C (pins 3 & 5).
 IOTHUB_DEVICE_MOISTURE | "SIM" or "I2C" | "I2C" | If "I2C" connect moisture sensor to SDA/SCL of I2C (pins 3 & 5).
@@ -53,6 +53,9 @@ IOTHUB_DEVICE_LIGHT | "SIM" | "SIM" | Light sensor (Adafruit VEML7700) is not su
 IOTHUB_DEVICE_DPS_DEVICE_ID | device id | "smart-water-valve-01" | This should be a unique ID to identify your device.  See [Obtaining your device values](#obtaining-your-device-values) section.
 IOTHUB_DEVICE_DPS_ID_SCOPE | scope | "0ne...F2" | See [Obtaining your device values](#obtaining-your-device-values) section.
 IOTHUB_DEVICE_DPS_DEVICE_KEY | key | "r+itP...kIa0=" | See [Obtaining your device values](#obtaining-your-device-values) section.
+
+## Connecting sensors to the Raspberry Pi
+![](./docs/PiPinOut.png)
 
 ## Configuring I2C on your Raspberry Pi
 
