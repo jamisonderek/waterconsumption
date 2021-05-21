@@ -123,30 +123,6 @@ async def execute_command_listener(
             print("responding to the {command} command failed".format(command=method_name))
 
 
-async def execute_property_listener(device_client):
-    ignore_keys = ["__t", "$version"]
-    while True:
-        patch = await device_client.receive_twin_desired_properties_patch()  # blocking call
-
-        print("the data in the desired properties patch was: {}".format(patch))
-
-        version = patch["$version"]
-        prop_dict = {}
-
-        for prop_name, prop_value in patch.items():
-            if prop_name in ignore_keys:
-                continue
-            else:
-                prop_dict[prop_name] = {
-                    "ac": 200,
-                    "ad": "Successfully executed patch",
-                    "av": version,
-                    "value": prop_value,
-                }
-
-        await device_client.patch_twin_reported_properties(prop_dict)
-
-
 # END COMMAND AND PROPERTY LISTENERS
 #####################################################
 
@@ -238,8 +214,7 @@ async def main():
             method_name="turnValveOff",
             user_command_handler=turn_valve_off_handler,
             create_user_response_handler=turn_valve_off_response,
-        ),
-        execute_property_listener(device_client),
+        )
     )
 
     ################################################
@@ -275,6 +250,31 @@ async def main():
 
     send_telemetry_task = asyncio.create_task(send_telemetry())
     send_valve_telemetry_task = asyncio.create_task(send_valve_telemetry())
+
+    async def twin_patch_handler(patch):
+        print("the data in the desired properties patch was: {0}".format(patch))
+        
+        ignore_keys = ["__t", "$version"]
+        version = patch["$version"]
+        prop_dict = {}
+
+        for prop_name, prop_value in patch.items():
+            if prop_name in ignore_keys:
+                continue
+            else:
+                prop_dict[prop_name] = {
+                    "ac": 200,
+                    "ad": "Successfully executed patch",
+                    "av": version,
+                    "value": prop_value,
+                }
+
+        await device_client.patch_twin_reported_properties(prop_dict)
+
+    device_client.on_twin_desired_properties_patch_received = twin_patch_handler
+
+    twin = await device_client.get_twin()
+    print("the twin was: {0}".format(twin))
 
     # Run the stdin listener in the event loop
     loop = asyncio.get_running_loop()
