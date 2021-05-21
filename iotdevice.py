@@ -14,6 +14,18 @@ class IotDevice:
         self.__moisture = 0.0
         self.__light = 0.0
         self.__flow = 0.0
+        self.__location = None
+
+    def set_location(self, location):
+        self.__location = location
+        print ("Location for device set to {0}".format(location))
+
+    def get_location(self):
+        return self.__location
+
+    location = property(
+        get_location
+    )
 
     def cancel_timer(self):
         if self.__timer != None:

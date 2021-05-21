@@ -253,7 +253,9 @@ async def main():
 
     async def twin_patch_handler(patch):
         print("the data in the desired properties patch was: {0}".format(patch))
-        
+        if "DeviceLocation" in patch:
+            iot_device.set_location(patch["DeviceLocation"])
+       
         ignore_keys = ["__t", "$version"]
         version = patch["$version"]
         prop_dict = {}
@@ -275,6 +277,10 @@ async def main():
 
     twin = await device_client.get_twin()
     print("the twin was: {0}".format(twin))
+    if "desired" in twin:
+        twin = twin["desired"]
+        if "DeviceLocation" in twin:
+            iot_device.set_location(twin["DeviceLocation"])
 
     # Run the stdin listener in the event loop
     loop = asyncio.get_running_loop()
