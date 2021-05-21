@@ -55,7 +55,18 @@ IOTHUB_DEVICE_DPS_ID_SCOPE | scope | "0ne...F2" | See [Obtaining your device val
 IOTHUB_DEVICE_DPS_DEVICE_KEY | key | "r+itP...kIa0=" | See [Obtaining your device values](#obtaining-your-device-values) section.
 
 ## Connecting sensors to the Raspberry Pi
+Depending on the sensors you are using, you may need to connect multiple 
+sensors to the same pin on the Raspberry Pi (for example if you have multiple I2C devices or have more than two sensors requiring 3.3 volts).
 ![](./docs/PiPinOut.png)
+Sensor | Example part description
+------|------
+Moisture Sensor | Adafruit STEMMA Soil Sensor - I2C Capacitive Moisture Sensor
+BME280 Sensor | Adafruit BME280 I2C or SPI Temperature Humidity Pressure Sensor - STEMMA QT
+Light Sensor | Adafruit VEML7700 Lux Sensor - I2C Light Sensor
+Flow Meter | Adafruit Liquid Flow Meter - Plastic 1/2" NPS Threaded  (You may want a different sensor depending on the threading)
+DHT11 |Adafruit DHT11 basic temperature-humidity sensor + extras
+DHT22 |Adafruit DHT22 temperature-humidity sensor + extras
+Relay | HiLetgo 2pcs 5V One Channel Relay Module Relay Switch with OPTO Isolation High Low Level Trigger
 
 ## Configuring I2C on your Raspberry Pi
 
