@@ -8,6 +8,33 @@ To install the application dependencies, please run the following command:
 pip3 install -r requirements.txt
 ```
 
+## Configuring I2C on your Raspberry Pi
+
+Make sure your I2C interface is enabled:
+```
+sudo raspi-config
+(choose "Interface options")
+(then enable the "I2C" interface)
+```
+You may need to reboot your device after making changes.
+
+```
+sudo i2cdetect -y 1
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:          -- -- -- -- -- -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+30: -- -- -- -- -- -- 36 -- -- -- -- -- -- -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+70: -- -- -- -- -- -- 76 --
+```
+1. The Adafruit moisture sensor should be on address 0x36.
+1. The BME280 sensor should be on address 0x76.  (If it is on address 0x77 then update the code in bme280.py, replacing 0x76 with 0x77.  The other option is there is usually something on your hardware, jumper/trace/etc. that can be modified to change the address.)
+1. If all entries show -- and you have hardware connected, double check your SDA/SCL wires are not swapped and that your 3.3V and GND wires have a good connection to both the Pi and the sensor.
+
+
 ## Setup for debugging in Visual Studio Code
 1. Go to your [Azure IoT Central portal](https://waterconsumption.azureiotcentral.com/admin/device-connection).
 1. Click on **Administration**
