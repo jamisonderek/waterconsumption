@@ -164,6 +164,15 @@ async def main():
     registration_id = os.getenv("IOTHUB_DEVICE_DPS_DEVICE_ID")
     symmetric_key = os.getenv("IOTHUB_DEVICE_DPS_DEVICE_KEY")
 
+    # Check to see if they have dps id_scope, dps device_key, and dps device_id
+    # filled out correctly..
+    if (id_scope is None or id_scope == '<Your Scope Here...>' or 
+        symmetric_key is None or symmetric_key == '<Your Key Here...>' or
+        registration_id is None or registration_id == '<Your Device ID Here...>'):
+        raise ValueError(
+            'Make sure you have your device environment variables setup correctly! ' 
+            'See https://github.com/jamisonderek/waterconsumption#obtaining-your-device-values')
+
     registration_result = await provision_device(
         provisioning_host, id_scope, registration_id, symmetric_key, model_id
     )
@@ -183,7 +192,6 @@ async def main():
         raise RuntimeError(
             "Could not provision device. Aborting Plug and Play device connection."
         )
-
 
     # Connect the client.
     await device_client.connect()

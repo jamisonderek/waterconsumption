@@ -53,6 +53,7 @@ IOTHUB_DEVICE_LIGHT | "SIM" | "SIM" | Light sensor (Adafruit VEML7700) is not su
 IOTHUB_DEVICE_DPS_DEVICE_ID | device id | "smart-water-valve-01" | This should be a unique ID to identify your device.  See [Obtaining your device values](#obtaining-your-device-values) section.
 IOTHUB_DEVICE_DPS_ID_SCOPE | scope | "0ne...F2" | See [Obtaining your device values](#obtaining-your-device-values) section.
 IOTHUB_DEVICE_DPS_DEVICE_KEY | key | "r+itP...kIa0=" | See [Obtaining your device values](#obtaining-your-device-values) section.
+OPEN_WEATHER_API_KEY | key | "<Your Key Here...>" or "e4........o" | See [Getting OpenWeatherMaps API Key](#getting-openweathermaps-api-key) section.
 
 ## Connecting sensors to the Raspberry Pi
 Depending on the sensors you are using, you may need to connect multiple 
@@ -99,3 +100,7 @@ sudo i2cdetect -y 1
 1. Open and select the "smart_water_valve.py" file.
 1. Choose *Start Debugging* from the *Run* menu.
 
+## Getting OpenWeatherMaps API Key
+1. Sign up and get an API key (APPID) on your account page. https://home.openweathermap.org/users/sign_up
+2. Verify your email address via a confirmation letter that will be sent to you.
+3. After verification, check your Inbox again to find our welcome email that contains your API key and important information.

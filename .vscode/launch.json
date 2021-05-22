@@ -17,9 +17,10 @@
                 "IOTHUB_DEVICE_HUMIDITY_TEMP": "SIM",
                 "IOTHUB_DEVICE_MOISTURE": "SIM",
                 "IOTHUB_DEVICE_LIGHT": "SIM",
-                "IOTHUB_DEVICE_DPS_DEVICE_ID": "sample-device-01",
+                "IOTHUB_DEVICE_DPS_DEVICE_ID": "<Your Device ID Here...>",
                 "IOTHUB_DEVICE_DPS_ID_SCOPE": "<Your Scope Here...>",
-                "IOTHUB_DEVICE_DPS_DEVICE_KEY": "<Your Key Here...>"
+                "IOTHUB_DEVICE_DPS_DEVICE_KEY": "<Your Key Here...>",
+                "OPEN_WEATHER_API_KEY": "<Your Key Here...>"
             }
         }
     ]

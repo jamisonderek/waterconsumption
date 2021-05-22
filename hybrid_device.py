@@ -6,6 +6,7 @@ from raspberry_pi_device import RaspberryPi
 class HybridDevice(IotDevice):
     def __init__(self):
         super().__init__()
+        open_weather_api_key = getenv("OPEN_WEATHER_API_KEY", None)
         ip = getenv("IOTHUB_DEVICE_IP_ADDRESS", None)
         relay = getenv("IOTHUB_DEVICE_GPIO_RELAY", "SIM")
         if relay != "SIM":
@@ -35,7 +36,11 @@ class HybridDevice(IotDevice):
         print ("light: {0}".format(light))
 
         pi = RaspberryPi(relay, flow, ip, ht, moisture)
-        sim = SimulatedDevice(flowrate)
+        
+        if open_weather_api_key != None and open_weather_api_key != '<Your Key Here...>':
+            sim = SimulatedDevice(flowrate, open_weather_api_key)
+        else:
+            sim = SimulatedDevice(flowrate)
 
         self.__device_valve = sim if relay=="SIM" else pi
         self.__device_humidtemp = sim if ht=="SIM" else pi
