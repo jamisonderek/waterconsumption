@@ -18,7 +18,7 @@ class IotDevice:
 
     def set_location(self, location):
         self.__location = location
-        print ("Location for device set to {0}".format(location))
+        print ("Location for {0} set to {1}".format(self, location))
 
     def get_location(self):
         return self.__location
