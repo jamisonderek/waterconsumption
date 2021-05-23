@@ -47,6 +47,13 @@ class HybridDevice(IotDevice):
         self.__device_flow = sim if flow=="SIM" else pi
         self.__device_moist = sim if moisture=="SIM" else pi
         self.__device_light = sim if light=="SIM" else pi
+        self.__pi = pi
+        self.__sim = sim
+
+    def set_location(self, location):
+        super().set_location(location)
+        self.__pi.set_location(location)
+        self.__sim.set_location(location)
 
     def get_valve(self):
         return self.__device_valve.get_valve()

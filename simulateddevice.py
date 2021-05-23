@@ -12,17 +12,19 @@ class SimulatedDevice(IotDevice):
         super().set_moisture(0.5)
         self.__flowrate = 6.2 if flowrate==None else flowrate
         self.__wet_offset = 0
-        # By default None.
+        self.__open_weather_api_key = open_weather_api_key
         self.api_endpoint = None
-        
-        if open_weather_api_key is not None:
-            if self.location is not None and 'lat' in self.location and 'lon' in self.location:
-                self.api_endpoint = ('http://api.openweathermap.org/data/2.5/weather?lat={0}&lon={1}&appid={2}&units=imperial'
-                                     .format(self.location['lat'], self.location['long'], open_weather_api_key))
 
         # spawn a task to update our data
         __update_task = asyncio.create_task(self.update_loop())
         # TODO: Cancel this task if our object gets deleted.
+
+    def set_location(self, location):
+        super().set_location(location)
+        if self.__open_weather_api_key is not None:
+            if self.location is not None and 'lat' in self.location and 'lon' in self.location:
+                self.api_endpoint = ('http://api.openweathermap.org/data/2.5/weather?lat={0}&lon={1}&appid={2}&units=imperial'
+                                     .format(self.location['lat'], self.location['lon'], self.__open_weather_api_key))
 
     def turn_valve_on(self):
         self.__wet_offset = 1.0 # After the valve is on, the ground is wetter.
@@ -51,9 +53,9 @@ class SimulatedDevice(IotDevice):
 
         # make ground wetter or dryer
         if self.__wet_offset > 0 and self.get_valve == ValveState.closed:
-            self.__wet_offset = self.__wet_offset-0.01
-        if self.__wet_offset < 3 and self.get_valve == ValveState.open:
-            self.__wet_offset = self.__wet_offset+0.01
+            self.__wet_offset = self.__wet_offset-0.05
+        if self.__wet_offset < 9.5 and self.get_valve == ValveState.open:
+            self.__wet_offset = self.__wet_offset+0.05
     
     def _set_by_generated_data(self):
         super().set_light(random.random()*10.0)
@@ -80,8 +82,11 @@ class SimulatedDevice(IotDevice):
             # Scale 1-2 is easy.
             # How to determine on a scale of 1-10?
 
-            # TODO: Amount of light (set 1-10)
-            super().set_light(random.random()*10.0)
+            if time_now<sunrise_timestamp or time_now>sunset_timestamp:
+                super().set_light(random.random()*1.0)
+            else:
+                # TODO: Amount of light (set 1-10) based on time
+                super().set_light(1.0 + random.random()*9.0)
             super().set_humidity_and_temperature(humidity=humidity, tempF=temperature_fahrenheit)
         except KeyError as e:
             print('JSON dictionary does not contain key {0}.. switching to setting by generated data..'.format(e))
@@ -90,4 +95,4 @@ class SimulatedDevice(IotDevice):
     async def update_loop(self):
         while True:
             self.update_data()
-            await asyncio.sleep(2)
+            await asyncio.sleep(10)
