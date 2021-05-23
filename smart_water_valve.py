@@ -256,9 +256,6 @@ async def main():
 
             await asyncio.sleep(5) # Update the flow data every 5 seconds.
 
-    send_telemetry_task = asyncio.create_task(send_telemetry())
-    send_valve_telemetry_task = asyncio.create_task(send_valve_telemetry())
-
     async def twin_patch_handler(patch):
         print("the data in the desired properties patch was: {0}".format(patch))
         if "DeviceLocation" in patch:
@@ -289,6 +286,11 @@ async def main():
         twin = twin["desired"]
         if "DeviceLocation" in twin:
             iot_device.set_location(twin["DeviceLocation"])
+
+    # Allow time for device to stablize before starting telemetry
+    await asyncio.sleep(10) 
+    send_telemetry_task = asyncio.create_task(send_telemetry())
+    send_valve_telemetry_task = asyncio.create_task(send_valve_telemetry())
 
     # Run the stdin listener in the event loop
     loop = asyncio.get_running_loop()
