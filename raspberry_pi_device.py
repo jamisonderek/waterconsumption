@@ -19,8 +19,6 @@ from iotdevice import IotDevice
 from time import sleep
 
 # TODO Brian: Add attributes for light sensor. 
-# TODO: Do we want to integrate some sort of weather tracker that
-# scrapes for weather data?
 class RaspberryPi(IotDevice):
     """ Class to interface with Raspberry Pi for
         an Automated Irrigation System. This Raspberry Pi
