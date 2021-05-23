@@ -93,34 +93,41 @@ async def send_telemetry_from_smart_valve(device_client, telemetry_msg):
 #####################################################
 # CREATE COMMAND AND PROPERTY LISTENERS
 
-async def execute_command_listener(
-    device_client, iot_device, method_name, user_command_handler, create_user_response_handler
-):
-    while True:
-        if method_name:
-            command_name = method_name
-        else:
-            command_name = None
+class CommandListener:
+    def __init__(self, device_client, iot_device):
+        self.__device_client = device_client
+        self.__iot_device = iot_device
+        device_client.on_method_request_received = self.process_request
 
-        command_request = await device_client.receive_method_request(command_name)
-
-        values = {}
-        if command_request.payload:
-            values = command_request.payload
-
-        await user_command_handler(iot_device, values)
-
-        response_status = 200
-        response_payload = await create_user_response_handler(iot_device, device_client, values)
-
-        command_response = MethodResponse.create_from_method_request(
-            command_request, response_status, response_payload
-        )
-
+    async def process_request(self, command_request):
         try:
-            await device_client.send_method_response(command_response)
-        except Exception:
-            print("responding to the {command} command failed".format(command=method_name))
+            if command_request.name == "turnValveOn":
+                user_command_handler=turn_valve_on_handler
+                create_user_response_handler=turn_valve_on_response
+            elif command_request.name == "turnValveOff":
+                user_command_handler=turn_valve_off_handler
+                create_user_response_handler=turn_valve_off_response
+            else:
+                print ("Unknown command: {0}".format(command_request.name))
+                return
+            print ("Processing command: {0}".format(command_request.name))
+
+            values = {}
+            if command_request.payload:
+                values = command_request.payload
+
+            await user_command_handler(self.__iot_device, values)
+
+            response_status = 200
+            response_payload = await create_user_response_handler(self.__iot_device, self.__device_client, values)
+
+            command_response = MethodResponse.create_from_method_request(
+                command_request, response_status, response_payload
+            )
+
+            await self.__device_client.send_method_response(command_response)
+        except Exception as e:
+            print("responding to the {command} command failed with {excep}".format(command=command_request.name, excep=e))
 
 
 # END COMMAND AND PROPERTY LISTENERS
@@ -206,24 +213,9 @@ async def main():
 
     ################################################
     # Register callback and Handle command (reboot)
-    print("Listening for command requests and property updates")
 
-    listeners = asyncio.gather(
-        execute_command_listener(
-            device_client,
-            iot_device,
-            method_name="turnValveOn",
-            user_command_handler=turn_valve_on_handler,
-            create_user_response_handler=turn_valve_on_response,
-        ),
-        execute_command_listener(
-            device_client,
-            iot_device,
-            method_name="turnValveOff",
-            user_command_handler=turn_valve_off_handler,
-            create_user_response_handler=turn_valve_off_response,
-        )
-    )
+    print("Listening for command requests and property updates")
+    command_listener = CommandListener(device_client, iot_device)
 
     ################################################
     # Send telemetry 
@@ -298,11 +290,6 @@ async def main():
     # Wait for user to indicate they are done listening for method calls
     user_finished = loop.run_in_executor(None, stdin_listener)
     await user_finished
-
-    if not listeners.done():
-        listeners.set_result("DONE")
-
-    listeners.cancel()
 
     send_telemetry_task.cancel()
     send_valve_telemetry_task.cancel()
