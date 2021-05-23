@@ -138,7 +138,7 @@ class CommandListener:
 
 def stdin_listener():
     """
-    Listener for quitting the sample
+    Listener for quitting the application
     """
     while True:
         selection = input("Press Q to quit\n")
@@ -205,11 +205,6 @@ async def main():
 
     iot_device = HybridDevice()
     iot_device.turn_valve_off()
-
-    ################################################
-    # Set and read desired property (target temperature)
-
-    #await device_client.patch_twin_reported_properties({"maxTempSinceLastReboot": max_temp})
 
     ################################################
     # Register callback and Handle command (reboot)
