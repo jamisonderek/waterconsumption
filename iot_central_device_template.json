@@ -1,0 +1,224 @@
+[
+  {
+    "@id": "dtmi:waterconsumption:SmartWaterValve;1",
+    "@type": "Interface",
+    "contents": [
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:turnValveOn;1",
+        "@type": "Command",
+        "commandType": "synchronous",
+        "displayName": {
+          "en": "Turn Valve On"
+        },
+        "name": "turnValveOn",
+        "request": {
+          "@type": "CommandPayload",
+          "displayName": {
+            "en": "DurationInSeconds"
+          },
+          "name": "DurationInSeconds",
+          "schema": "double"
+        },
+        "response": {
+          "@type": "CommandPayload",
+          "displayName": {
+            "en": "Device Response"
+          },
+          "name": "DeviceResponse",
+          "schema": {
+            "@type": "Object",
+            "displayName": {
+              "en": "Object"
+            },
+            "fields": [
+              {
+                "displayName": {
+                  "en": "Start Time"
+                },
+                "name": "startTime",
+                "schema": "dateTime"
+              },
+              {
+                "displayName": {
+                  "en": "End Time"
+                },
+                "name": "endTime",
+                "schema": "dateTime"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:turnValveOff;1",
+        "@type": "Command",
+        "commandType": "synchronous",
+        "displayName": {
+          "en": "Turn Valve Off"
+        },
+        "name": "turnValveOff",
+        "response": {
+          "@type": "CommandPayload",
+          "displayName": {
+            "en": "Device Response"
+          },
+          "name": "DeviceResponse",
+          "schema": {
+            "@type": "Object",
+            "displayName": {
+              "en": "Object"
+            },
+            "fields": [
+              {
+                "displayName": {
+                  "en": "End Time"
+                },
+                "name": "endTime",
+                "schema": "dateTime"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:Valve;1",
+        "@type": [
+          "Telemetry",
+          "State"
+        ],
+        "displayName": {
+          "en": "Valve"
+        },
+        "name": "Valve",
+        "schema": {
+          "@id": "dtmi:waterconsumption:SmartWaterValve:Valve:schema;1",
+          "@type": "Enum",
+          "enumValues": [
+            {
+              "@id": "dtmi:waterconsumption:SmartWaterValve:Valve:schema:Open;1",
+              "displayName": {
+                "en": "Open"
+              },
+              "enumValue": "ValveState.open",
+              "name": "Open"
+            },
+            {
+              "@id": "dtmi:waterconsumption:SmartWaterValve:Valve:schema:Closed;1",
+              "displayName": {
+                "en": "Closed"
+              },
+              "enumValue": "ValveState.closed",
+              "name": "Closed"
+            }
+          ],
+          "valueSchema": "string"
+        }
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:Flow;1",
+        "@type": [
+          "Telemetry",
+          "VolumeFlowRate"
+        ],
+        "displayName": {
+          "en": "Flow"
+        },
+        "name": "Flow",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:Moisture;1",
+        "@type": "Telemetry",
+        "description": {
+          "en": "[0=dry..10=wet]"
+        },
+        "displayName": {
+          "en": "Moisture"
+        },
+        "name": "Moisture",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:Light;1",
+        "@type": [
+          "Telemetry",
+          "Illuminance"
+        ],
+        "description": {
+          "en": "[0=dark..10=sunny]"
+        },
+        "displayName": {
+          "en": "Light"
+        },
+        "name": "Light",
+        "schema": "double"
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:Temperature;1",
+        "@type": [
+          "Telemetry",
+          "Temperature"
+        ],
+        "displayName": {
+          "en": "Temperature"
+        },
+        "name": "Temperature",
+        "schema": "double",
+        "unit": "degreeFahrenheit"
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:Humidity;1",
+        "@type": [
+          "Telemetry",
+          "RelativeHumidity"
+        ],
+        "displayName": {
+          "en": "Humidity"
+        },
+        "name": "Humidity",
+        "schema": "double",
+        "unit": "percent"
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:DeviceLocation;1",
+        "@type": [
+          "Property",
+          "Location"
+        ],
+        "displayName": {
+          "en": "Device Location"
+        },
+        "name": "DeviceLocation",
+        "schema": "geopoint",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:TargetMoisture;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "Target Moisture"
+        },
+        "name": "TargetMoisture",
+        "schema": "double",
+        "writable": true
+      },
+      {
+        "@id": "dtmi:waterconsumption:SmartWaterValve:MayNeedWatering;1",
+        "@type": "Property",
+        "displayName": {
+          "en": "May need watering"
+        },
+        "name": "MayNeedWatering",
+        "schema": "boolean",
+        "writable": true
+      }
+    ],
+    "displayName": {
+      "en": "Smart Water Valve"
+    },
+    "@context": [
+      "dtmi:iotcentral:context;2",
+      "dtmi:dtdl:context;2"
+    ]
+  }
+]
